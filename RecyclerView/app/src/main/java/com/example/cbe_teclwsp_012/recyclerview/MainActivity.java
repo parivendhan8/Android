@@ -74,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
         Context context;
         ArrayList<String> list;
         Myinterface myinterface;
+        Boolean checkBox_TAG = false;
 
 
         public Adapter(Context context, ArrayList<String> list, Myinterface myinterface) {
@@ -110,8 +111,11 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
 
-                    myinterface.onClick(true);
+//                    myinterface.onClick(true);
                     int count = Adapter.this.getItemCount();
+
+                            checkBox_TAG = true;
+
 
 //                    for (int i = 0; i < count; i++) {
 //                        if (holder.checkbox.getVisibility() == View.VISIBLE) {
@@ -123,6 +127,17 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             });
+
+            if (checkBox_TAG)
+            {
+                holder.checkbox.setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                holder.checkbox.setVisibility(View.GONE);
+
+            }
+
 
 
         }
