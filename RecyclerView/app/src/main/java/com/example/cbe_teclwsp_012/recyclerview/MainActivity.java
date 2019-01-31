@@ -41,28 +41,7 @@ public class MainActivity extends AppCompatActivity {
             arrayList_name.add(" Name :" + i);
         }
 
-        adapter = new Adapter(MainActivity.this, arrayList_name, new Adapter.Myinterface() {
-            @Override
-            public void onClick(Boolean pos) {
-
-                if (pos) {
-                    int count = recyclerView.getChildCount();
-
-                    for (int i = 0; i < count; i++) {
-                        checkBox = (CheckBox) recyclerView.getChildAt(i).findViewById(R.id.checkbox);
-
-                        if (checkBox.getVisibility() == View.VISIBLE) {
-                            checkBox.setVisibility(View.INVISIBLE);
-                        } else {
-                            checkBox.setVisibility(View.VISIBLE);
-                        }
-
-                    }
-
-                }
-
-            }
-        });
+        adapter = new Adapter(MainActivity.this, arrayList_name);
         recyclerView.setAdapter(adapter);
 
 
@@ -73,14 +52,11 @@ public class MainActivity extends AppCompatActivity {
 
         Context context;
         ArrayList<String> list;
-        Myinterface myinterface;
-        Boolean checkBox_TAG = false;
+        public static Boolean checkBox_TAG = false;
 
-
-        public Adapter(Context context, ArrayList<String> list, Myinterface myinterface) {
+        public Adapter(Context context, ArrayList<String> list) {
             this.context = context;
             this.list = list;
-            this.myinterface = myinterface;
         }
 
         @Override
@@ -94,12 +70,17 @@ public class MainActivity extends AppCompatActivity {
             return position;
         }
 
+        @Override
+        public int getItemViewType(int position) {
+            return position;
+        }
+
         @NonNull
         @Override
         public MyViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
 
             View view = LayoutInflater.from(context).inflate(R.layout.custom_listview, null);
-            return new Adapter.MyViewHolder(view);
+            return new MyViewHolder(view);
 
         }
 
@@ -111,33 +92,24 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
 
-//                    myinterface.onClick(true);
-                    int count = Adapter.this.getItemCount();
 
-                            checkBox_TAG = true;
+                    if (checkBox_TAG)
+                        checkBox_TAG = false;
+                    else
+                        checkBox_TAG = true;
+
+                    notifyDataSetChanged();
 
 
-//                    for (int i = 0; i < count; i++) {
-//                        if (holder.checkbox.getVisibility() == View.VISIBLE) {
-//                            holder.checkbox.setVisibility(View.GONE);
-//                        } else {
-//                            holder.checkbox.setVisibility(View.VISIBLE);
-//                        }
-//                    }
+
 
                 }
             });
 
             if (checkBox_TAG)
-            {
-                holder.checkbox.setVisibility(View.VISIBLE);
-            }
-            else
-            {
                 holder.checkbox.setVisibility(View.GONE);
-
-            }
-
+            else
+                holder.checkbox.setVisibility(View.VISIBLE);
 
 
         }
@@ -156,9 +128,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        interface Myinterface {
-            void onClick(Boolean pos);
-        }
+
     }
 
 
@@ -175,11 +145,10 @@ public class MainActivity extends AppCompatActivity {
 
         switch (item.getItemId()) {
             case R.id.list_menu:
-//                for(int i = 0;  i < recyclerView.getChildCount(); i++)
-//                {
-//                    checkBox = (CheckBox)recyclerView.getChildAt(i).findViewById(R.id.checkbox);
-//                    checkBox.setVisibility(View.INVISIBLE);
-//                }
+
+                Adapter.checkBox_TAG = false;
+                adapter.notifyDataSetChanged();
+
 
 
         }

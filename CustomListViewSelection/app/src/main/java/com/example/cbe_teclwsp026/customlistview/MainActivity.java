@@ -3,26 +3,32 @@ package com.example.cbe_teclwsp026.customlistview;
 import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.ActionMode;
+import android.view.Display;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
 
     ListView listView;
 
-    String[] maintitle ={
-            "Title 1","Title 2", "Title 3","Title 4", "Title 5", "Title 3","Title 4",
-            "Title 5", "Title 3","Title 4", "Title 5", "Title 3","Title 4", "Title 5", "Title 3","Title 4", "Title 5"
-    ,"Title 5", "Title 3","Title 4", "Title 5", "Title 3","Title 4", "Title 5", "Title 3","Title 4", "Title 5"
-    ,"Title 5", "Title 3","Title 4", "Title 5", "Title 3","Title 4", "Title 5", "Title 3","Title 4", "Title 5"};
+    ArrayList<Model> arrayList = new ArrayList<Model>();
 
+    public static Boolean isSeleted = false;
 
 
     @Override
@@ -30,9 +36,24 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final Adapter adapter=new Adapter(this, maintitle);
+
+        for (int i = 0; i < 50; i++)
+        {
+            Model model = new Model();
+            model.setName("Title - " + i);
+            model.setChecked(false);
+            arrayList.add(model);
+        }
+
+
+        final Adapter adapter=new Adapter(this, arrayList);
         listView=(ListView)findViewById(R.id.listView);
         listView.setAdapter(adapter);
+
+//        listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
+//        listView.setMultiChoiceModeListener(modeListener);
+
+
         adapter.notifyDataSetChanged();
 
         View view = LayoutInflater.from(MainActivity.this).inflate(R.layout.custom_listview, null);
@@ -45,6 +66,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
+
+                isSeleted = true;
+                adapter.notifyDataSetChanged();
 
 //                view.setOnFocusChangeListener(new View.OnFocusChangeListener() {
 //                    @Override
@@ -61,18 +85,15 @@ public class MainActivity extends AppCompatActivity {
 //                    }
 //                });
 
-
-
-
-                for(int i =0 ; i < parent.getChildCount(); i++ )
-                {
-                    View cb = parent.getChildAt(i).findViewById(R.id.checkbox);
-
-                    if (cb.getVisibility() == View.VISIBLE)
-                        cb.setVisibility(View.GONE);
-                    else
-                        cb.setVisibility(View.VISIBLE);
-                }
+//                for(int i =0 ; i < parent.getChildCount(); i++ )
+//                {
+//                    View cb = parent.getChildAt(i).findViewById(R.id.checkbox);
+//
+//                    if (cb.getVisibility() == View.VISIBLE)
+//                        cb.setVisibility(View.GONE);
+//                    else
+//                        cb.setVisibility(View.VISIBLE);
+//                }
 
 
 
@@ -84,25 +105,61 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+//    AbsListView.MultiChoiceModeListener modeListener = new AbsListView.MultiChoiceModeListener() {
+//        @Override
+//        public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+//
+//
+//        }
+//
+//        @Override
+//        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+//            isSeleted = true;
+//
+//            return false;
+//        }
+//
+//        @Override
+//        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+//            return false;
+//        }
+//
+//        @Override
+//        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+//            return false;
+//        }
+//
+//        @Override
+//        public void onDestroyActionMode(ActionMode mode) {
+//
+//            isSeleted = false;
+//
+//        }
+//    };
+
+
     class Adapter extends BaseAdapter{
 
         private Context context;
-        private String[] maintitle;
+        private ArrayList<Model> maintitle;
         MyViewHolder holder;
+        Boolean check_TAG = false;
 
-        public Adapter(Context context, String[] maintitle) {
+
+        public Adapter(Context context, ArrayList<Model> maintitle) {
             this.context = context;
             this.maintitle = maintitle;
         }
 
         @Override
         public int getCount() {
-            return maintitle.length;
+            return maintitle.size();
         }
 
         @Override
         public Object getItem(int position) {
-            return maintitle[position];
+            return maintitle.get(position);
         }
 
         @Override
@@ -113,13 +170,17 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public int getItemViewType(int position) {
-            return super.getItemViewType(position);
+
+            if (maintitle.get(position).getChecked())
+            {
+                check_TAG = true;
+            }
+
+            return position;
         }
 
         @Override
-        public View getView(int position, View v, final ViewGroup parent) {
-
-
+        public View getView(final int position, View v, final ViewGroup parent) {
 
             if (v == null)
             {
@@ -132,9 +193,45 @@ public class MainActivity extends AppCompatActivity {
                 holder = (MyViewHolder) v.getTag();
             }
 
-            holder.title.setText(maintitle[position]);
+
+            holder.title.setText(maintitle.get(position).getName());
 
             final MyViewHolder finalHolder = holder;
+
+            if (isSeleted){
+                holder.checkBox.setVisibility(View.VISIBLE);
+            }else {
+                holder.checkBox.setVisibility(View.GONE);
+            }
+
+
+            holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                    if (isChecked)
+                        maintitle.get(position).setChecked(true);
+
+                    for (int i = 0; i < parent.getChildCount(); i++)
+                    {
+                         CheckBox cb = (CheckBox) parent.getChildAt(i).findViewById(R.id.checkbox);
+
+                    }
+
+                }
+            });
+
+
+
+
+            if (maintitle.get(position).getChecked())
+            {
+//                CheckBox cb = (CheckBox) parent.getChildAt(position).findViewById(R.id.checkbox);
+//                cb.setChecked(true);
+            }
+
+
+
 
 //            holder.title.setOnLongClickListener(new View.OnLongClickListener() {
 //                @Override
